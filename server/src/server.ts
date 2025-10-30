@@ -1,16 +1,30 @@
 // All imports must be at the very top.
 import dotenv from 'dotenv';
 import http from 'http';
-import app from './app';
 import type { AddressInfo } from 'net';
 
-// Execute code only after all modules are imported.
-dotenv.config(); // Load environment variables from .env file
+// Load environment variables FIRST
+dotenv.config();
+
+console.log('🚀 Starting server...');
+console.log(`📦 PORT: ${process.env.PORT || 3001}`);
+console.log(`🔑 API Key present: ${!!process.env.GEMINI_API_KEY}`);
 
 if (!process.env.GEMINI_API_KEY) {
-    console.error("\nFATAL ERROR: GEMINI_API_KEY is not defined.");
-    console.error("Please create a .env file in the /server directory and add your API key.");
-    console.error("Example: GEMINI_API_KEY=your_google_api_key_here\n");
+    console.error("\n❌ FATAL ERROR: GEMINI_API_KEY is not defined.");
+    console.error("Please add GEMINI_API_KEY in Railway Variables.\n");
+    process.exit(1);
+}
+
+// Try to import app - this is where the crash likely happens
+let app;
+try {
+    console.log('📥 Importing app...');
+    app = require('./app').default;
+    console.log('✅ App imported successfully');
+} catch (error) {
+    console.error('❌ FATAL ERROR importing app:');
+    console.error(error);
     process.exit(1);
 }
 
@@ -29,7 +43,8 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-// CRITICAL FIX: Bind to 0.0.0.0 for Railway
+// CRITICAL: Bind to 0.0.0.0 for Railway
+console.log(`🌐 Binding to 0.0.0.0:${port}...`);
 server.listen(port, '0.0.0.0');
 
 /**
@@ -40,10 +55,10 @@ function onError(error: Error & { syscall: string; code: string }): void {
     const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
     switch (error.code) {
         case 'EACCES':
-            console.error(`${bind} requires elevated privileges`);
+            console.error(`❌ ${bind} requires elevated privileges`);
             process.exit(1);
         case 'EADDRINUSE':
-            console.error(`${bind} is already in use`);
+            console.error(`❌ ${bind} is already in use`);
             process.exit(1);
         default:
             throw error;
@@ -56,14 +71,26 @@ function onError(error: Error & { syscall: string; code: string }): void {
 function onListening(): void {
     const addr = server.address();
     if (!addr) {
-        console.error('Server address not available');
+        console.error('❌ Server address not available');
         return;
     }
     const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${(addr as AddressInfo).port}`;
     console.info(`✅ Server listening on ${bind}`);
     console.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.info(`🔑 API Key configured: ${process.env.GEMINI_API_KEY ? 'Yes' : 'No'}`);
 }
 
 server.on('error', onError);
 server.on('listening', onListening);
+
+// Catch any unhandled errors
+process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:');
+    console.error(error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise);
+    console.error('Reason:', reason);
+    process.exit(1);
+});
