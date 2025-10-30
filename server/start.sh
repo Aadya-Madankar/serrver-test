@@ -1,10 +1,24 @@
 #!/bin/bash
+set -e  # Exit immediately if a command exits with a non-zero status
 
-# Install dependencies
-npm install
+echo "🚀 Starting deployment process..."
 
-# Build TypeScript
+echo "📁 Current directory: $(pwd)"
+echo "📂 Listing files:"
+ls -la
+
+echo ""
+echo "📦 Installing dependencies..."
+npm ci --production=false
+
+echo ""
+echo "🔨 Building TypeScript to JavaScript..."
 npm run build
 
-# Start the server
-npm start
+echo ""
+echo "📂 Checking compiled files:"
+ls -la dist/
+
+echo ""
+echo "🌍 Starting Node.js server..."
+node dist/server.js
