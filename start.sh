@@ -1,16 +1,20 @@
 #!/bin/bash
 set -e
 
-# Install Node.js using apt-get (for Debian-based containers)
-echo "📦 Installing Node.js..."
+echo "📦 Installing Node.js 20.x first..."
 apt-get update -qq
-apt-get install -y -qq nodejs npm
+apt-get install -y -qq curl gnupg2
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y -qq nodejs
 
-echo "🚀 Starting AI Agent Server..."
 echo ""
+echo "✅ Node.js version:"
+node --version
+npm --version
 
 cd server
 
+echo ""
 echo "📦 Installing dependencies..."
 npm ci --omit=dev
 
@@ -21,7 +25,7 @@ npm run build
 echo ""
 echo "✅ Build completed!"
 echo ""
-echo "🌍 Starting server on port 3001..."
+echo "🌍 Starting server..."
 echo ""
 
-node dist/server.js
+npm start
