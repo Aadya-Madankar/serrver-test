@@ -31,7 +31,7 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-server.listen(port);
+server.listen(port, '0.0.0.0');
 
 /**
  * Event listener for HTTP server "error" event.
