@@ -39,10 +39,10 @@ router.get('/key', (req: Request, res: Response) => {
 });
 
 // ============================================
-// AGENT DISCOVERY ENDPOINTS (ONLY 2 NEW ONES NEEDED!)
+// AGENT DISCOVERY ENDPOINTS (NEW - 2 ENDPOINTS)
 // ============================================
 
-// Get all available agents
+// NEW: Get all available agents
 router.get('/agents', (req: Request, res: Response) => {
   try {
     const agents = Array.from(agentRegistry.keys()).map(name => ({
@@ -51,11 +51,12 @@ router.get('/agents', (req: Request, res: Response) => {
     }));
     res.json({ agents });
   } catch (error) {
+    console.error('Error fetching agents:', error);
     res.status(500).json({ error: 'Failed to fetch agents' });
   }
 });
 
-// Get specific agent config
+// NEW: Get specific agent config
 router.get('/agents/:agentName/config', (req: Request, res: Response) => {
   try {
     const { agentName } = req.params;
@@ -67,6 +68,7 @@ router.get('/agents/:agentName/config', (req: Request, res: Response) => {
     
     res.json(agentConfig);
   } catch (error) {
+    console.error('Error fetching agent config:', error);
     res.status(500).json({ error: 'Failed to fetch agent config' });
   }
 });
