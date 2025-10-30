@@ -39,7 +39,7 @@ router.get('/key', (req: Request, res: Response) => {
 });
 
 // ============================================
-// AGENT DISCOVERY ENDPOINTS (NEW)
+// AGENT DISCOVERY ENDPOINTS (ONLY 2 NEW ONES NEEDED!)
 // ============================================
 
 // Get all available agents
