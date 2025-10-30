@@ -8,15 +8,14 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y -qq nodejs
 
 echo ""
-echo "✅ Node.js version:"
-node --version
-npm --version
+echo "✅ Node.js $(node --version)"
+echo "✅ npm $(npm --version)"
 
 cd server
 
 echo ""
-echo "📦 Installing dependencies..."
-npm ci --omit=dev
+echo "📦 Installing ALL dependencies (including dev)..."
+npm ci
 
 echo ""
 echo "🔨 Building TypeScript..."
