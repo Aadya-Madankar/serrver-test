@@ -14,8 +14,8 @@ echo "✅ npm $(npm --version)"
 cd server
 
 echo ""
-echo "📦 Installing ALL dependencies (including dev)..."
-npm ci
+echo "📦 Installing ALL dependencies..."
+npm install
 
 echo ""
 echo "🔨 Building TypeScript..."
