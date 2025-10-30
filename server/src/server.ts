@@ -1,4 +1,3 @@
-
 // All imports must be at the very top.
 import dotenv from 'dotenv';
 import http from 'http';
@@ -15,7 +14,6 @@ if (!process.env.GEMINI_API_KEY) {
     process.exit(1);
 }
 
-
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -31,12 +29,12 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
+// CRITICAL FIX: Bind to 0.0.0.0 for Railway
 server.listen(port, '0.0.0.0');
 
 /**
  * Event listener for HTTP server "error" event.
  */
-// FIX: Replaced 'NodeJS.ErrnoException' with a compatible intersection type to remove dependency on the 'NodeJS' namespace.
 function onError(error: Error & { syscall: string; code: string }): void {
     if (error.syscall !== 'listen') throw error;
     const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
@@ -62,7 +60,9 @@ function onListening(): void {
         return;
     }
     const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${(addr as AddressInfo).port}`;
-    console.info(`Listening on ${bind}`);
+    console.info(`✅ Server listening on ${bind}`);
+    console.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.info(`🔑 API Key configured: ${process.env.GEMINI_API_KEY ? 'Yes' : 'No'}`);
 }
 
 server.on('error', onError);
