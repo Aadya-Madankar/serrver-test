@@ -43,9 +43,11 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-// CRITICAL: Bind to 0.0.0.0 for Railway
+// CRITICAL: Bind to 0.0.0.0 for Railway with callback function
 console.log(`🌐 Binding to 0.0.0.0:${port}...`);
-server.listen(port, '0.0.0.0');
+server.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server started successfully!`);
+});
 
 /**
  * Event listener for HTTP server "error" event.
