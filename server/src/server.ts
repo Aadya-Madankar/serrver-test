@@ -10,73 +10,46 @@ console.log(`🔑 API Key present: ${!!process.env.GEMINI_API_KEY}`);
 
 if (!process.env.GEMINI_API_KEY) {
     console.error("\n❌ FATAL ERROR: GEMINI_API_KEY is not defined.");
-    console.error("Please add GEMINI_API_KEY in Railway Variables.\n");
     process.exit(1);
 }
 
 let app: any;
 try {
-    console.log('📥 Importing app...');
     app = require('./app').default;
     console.log('✅ App imported successfully');
 } catch (error) {
-    console.error('❌ FATAL ERROR importing app:');
-    console.error(error);
+    console.error('❌ FATAL ERROR importing app:', error);
     process.exit(1);
 }
 
-function normalizePort(val: string): number | string | false {
-    const port = parseInt(val, 10);
-    if (isNaN(port)) return val;
-    if (port >= 0) return port;
-    return false;
-}
-
-const port = normalizePort(process.env.PORT || '3001');
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 app.set('port', port);
 
 const server = http.createServer(app);
 
-server.listen(port, '0.0.0.0', () => {
+server.listen(port, () => {
     console.log(`✅ Server listening on port ${port}`);
 });
 
-function onError(error: Error & { syscall: string; code: string }): void {
+server.on('error', (error: any) => {
     if (error.syscall !== 'listen') throw error;
-    const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
-    switch (error.code) {
-        case 'EACCES':
-            console.error(`❌ ${bind} requires elevated privileges`);
-            process.exit(1);
-        case 'EADDRINUSE':
-            console.error(`❌ ${bind} is already in use`);
-            process.exit(1);
-        default:
-            throw error;
+    if (error.code === 'EACCES') {
+        console.error(`Port ${port} requires elevated privileges`);
+        process.exit(1);
     }
-}
-
-function onListening(): void {
-    const addr = server.address();
-    if (!addr) {
-        console.error('❌ Server address not available');
-        return;
+    if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use`);
+        process.exit(1);
     }
-    const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${(addr as AddressInfo).port}`;
-    console.info(`✅ Server listening on ${bind}`);
-}
-
-server.on('error', onError);
-server.on('listening', onListening);
+    throw error;
+});
 
 process.on('uncaughtException', (error) => {
-    console.error('❌ Uncaught Exception:');
-    console.error(error);
+    console.error('❌ Uncaught Exception:', error);
     process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
-    console.error('❌ Unhandled Rejection:');
-    console.error(reason);
+    console.error('❌ Unhandled Rejection:', reason);
     process.exit(1);
 });
