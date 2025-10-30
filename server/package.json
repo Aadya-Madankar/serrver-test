@@ -7,9 +7,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "ts-node --project tsconfig.json src/server.ts"
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts"
   },
   "keywords": [],
   "author": "",
